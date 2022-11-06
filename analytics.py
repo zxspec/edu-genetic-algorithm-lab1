@@ -1,4 +1,5 @@
 import plotly.express as px
+import pandas as pd
 from deap.tools import Logbook, selBest
 
 
@@ -8,17 +9,22 @@ def get_best_solutions(population, n=1):
 
 def print_best_solutions(best_solutions: list, names: list, prices: list):
     for individual in best_solutions:
-        print(individual)
-        print(individual.fitness)
+        print('\n')
+        print('### best individual:', individual)
+        print('### best individual fitness value: ', individual.fitness)
+        print('### backpack items: ', )
         for i in range(len(individual)):
             if individual[i] == 1:
                 print('Name: ', names[i], ' - Price: ', prices[i])
 
-
 def render_statistic_in_browser(info: Logbook):
-    figure = px.line(
-        x=range(0, 101),
-        y=info.select('max'),
-        title='Genetic algorithm results')
+    df = pd.DataFrame({
+        'generations': info.select('gen'),
+        'min': info.select('min'),
+        'average': info.select('med'),
+        'best': info.select('max'),
+    })
 
-    figure.show()
+    fig = px.line(df, x='generations', y=['best', 'average', 'min'])
+
+    fig.show()

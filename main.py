@@ -1,3 +1,4 @@
+from contextlib import redirect_stdout
 from products_data import ProductsData
 from hyperparams import Hyperparams
 
@@ -20,9 +21,12 @@ def fitness(solution, products_data, hyperparams):
 
     return (cost,)
 
+for i in range(0, 5):
+    population, info = get_custom_ga(params, products_data, fitness)
+    render_statistic_in_browser(info)
+    best_solutions = get_best_solutions(population)
+    file_name = 'result-' + str(i) + '.txt'
+    with open(file_name, 'w') as f:
+        with redirect_stdout(f):
+            print_best_solutions(best_solutions, products_data.names, products_data.prices)
 
-population, info = get_custom_ga(params, products_data, fitness)
-
-best_solutions = get_best_solutions(population)
-print_best_solutions(best_solutions, products_data.names, products_data.prices)
-render_statistic_in_browser(info)
