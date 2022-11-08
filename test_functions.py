@@ -16,9 +16,9 @@ def deJong1(individual, products_data, hyperparams):
 # simplified implementation for binary coded individual
 # since individual is essentially a list of "0" and "1", then all of those values are within a range (-600, +600)
 # parameters products_data, hyperparams are not used but needed for a correct usage with our custom GA 
-def griewangk(individual, products_data, hyperparams):
-    return sum((x**2) / 4000 for x in individual) + \
-        product(cos(x / sqrt(i)) for i, x in enumerate(individual, 1)),
+def griewank(individual, products_data, hyperparams):
+    return sum(((x*100)**2) / 4000 for x in individual) + \
+        product(cos((x*100) / sqrt(i)) for i, x in enumerate(individual, 1)),
 
 def product(iterable):
     result = 1

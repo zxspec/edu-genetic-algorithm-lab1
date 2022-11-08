@@ -5,6 +5,20 @@ from hyperparams import Hyperparams
 from deap import base, creator, algorithms, tools
 
 
+def is_valid_individual(individual, products_data, hyperparams):
+    cost = 0
+    sum_space = 0
+    for i in range(len(individual)):
+        if individual[i] == 1:
+            cost += products_data.prices[i]
+            sum_space += products_data.spaces[i]
+            if sum_space > hyperparams.space_limit:
+                print('### ❌ individual: ', individual)
+                print('### ❌ susm_space: ', sum_space)
+                return False
+    return True
+
+
 def get_custom_ga(params: Hyperparams, products_data: ProductsData, fitness):
     genes_number = len(products_data.names)
     toolbox = base.Toolbox()
@@ -21,6 +35,10 @@ def get_custom_ga(params: Hyperparams, products_data: ProductsData, fitness):
     # create fitness function, name `evaluate` required by `eaSimple` algorithm
     toolbox.register('evaluate', fitness,
                      products_data=products_data, hyperparams=params)
+    toolbox.register('feasible', is_valid_individual,
+                     products_data=products_data, hyperparams=params)
+    toolbox.decorate("evaluate", tools.DeltaPenalty(toolbox.feasible, 1.0))
+
     # create crossover function, name `mate` required by `eaSimple` algorithm
     toolbox.register('mate', tools.cxOnePoint)
     # create mutation function, name `mutate` required by `eaSimple` algorithm
@@ -34,10 +52,9 @@ def get_custom_ga(params: Hyperparams, products_data: ProductsData, fitness):
     statistics = prepare_statistics_params()
 
     population, info = algorithms.eaSimple(population, toolbox, params.crossover_probability,
-                                           params.mutation_probability, params.number_of_generations, statistics)
+                                           params.mutation_probability, params.number_of_generations, statistics, verbose=True)
 
     return (population, info)
-
 
 def prepare_statistics_params():
     statistics = tools.Statistics(

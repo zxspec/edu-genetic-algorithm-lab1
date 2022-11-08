@@ -7,17 +7,14 @@ from custom_ga import get_custom_ga
 
 products_data = ProductsData()
 params = Hyperparams(space_limit=80)
+# params.mutation_probability = 0
 
 
 def fitness(solution, products_data, hyperparams):
     cost = 0
-    sum_space = 0
     for i in range(len(solution)):
         if solution[i] == 1:
             cost += products_data.prices[i]
-            sum_space += products_data.spaces[i]
-    if sum_space > hyperparams.space_limit:
-        cost = 1
 
     return (cost,)
 

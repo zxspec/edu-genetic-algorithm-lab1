@@ -1,12 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-"""
-https://en.wikipedia.org/wiki/Rastrigin_function
-
-Non-convex function for testing optimization algorithms.
-"""
-
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
 import math
