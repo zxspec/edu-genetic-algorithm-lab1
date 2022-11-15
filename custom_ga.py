@@ -13,8 +13,8 @@ def is_valid_individual(individual, products_data, hyperparams):
             cost += products_data.prices[i]
             sum_space += products_data.spaces[i]
             if sum_space > hyperparams.space_limit:
-                print('### ❌ individual: ', individual)
                 print('### ❌ susm_space: ', sum_space)
+                print('### ❌ individual: ', individual)
                 return False
     return True
 

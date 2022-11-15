@@ -4,7 +4,7 @@ from deap.tools import Logbook, selBest
 
 
 def get_best_solutions(population, n=1):
-    return selBest(population, 1)
+    return selBest(population, n)
 
 
 def print_best_solutions(best_solutions: list, names: list, prices: list):
@@ -12,7 +12,7 @@ def print_best_solutions(best_solutions: list, names: list, prices: list):
         print('\n')
         print('### best individual:', individual)
         print('### best individual fitness value: ', individual.fitness)
-        print('### backpack items: ', )
+        print('### items: ', )
         for i in range(len(individual)):
             if individual[i] == 1:
                 print('Name: ', names[i], ' - Price: ', prices[i])

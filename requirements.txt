@@ -2,3 +2,4 @@ numpy
 deap
 plotly
 pandas
+matplotlib
