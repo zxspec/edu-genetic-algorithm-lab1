@@ -5,7 +5,7 @@ from hyperparams import Hyperparams
 from deap import base, creator, algorithms, tools
 
 
-def is_valid_individual(individual, products_data, hyperparams):
+def is_valid_individual(individual, products_data, hyperparams, show_stats_when_valid=False):
     cost = 0
     sum_space = 0
     for i in range(len(individual)):
@@ -13,13 +13,17 @@ def is_valid_individual(individual, products_data, hyperparams):
             cost += products_data.prices[i]
             sum_space += products_data.spaces[i]
             if sum_space > hyperparams.space_limit:
-                print('### ❌ susm_space: ', sum_space)
+                print('### ❌ sum_space: ', sum_space)
                 print('### ❌ individual: ', individual)
                 return False
+    if show_stats_when_valid == True:
+        print('### 🔥 individual: ', individual)
+        print('### 🔥 sum_space: ', sum_space)
+        print('### 🔥 cost: ', cost)
     return True
 
 
-def get_custom_ga(params: Hyperparams, products_data: ProductsData, fitness):
+def get_custom_ga(params: Hyperparams, products_data: ProductsData, fitness, hall_of_fame):
     genes_number = len(products_data.names)
     toolbox = base.Toolbox()
     creator.create('FitnessMax', base.Fitness, weights=(1.0,))
@@ -52,9 +56,17 @@ def get_custom_ga(params: Hyperparams, products_data: ProductsData, fitness):
     statistics = prepare_statistics_params()
 
     population, info = algorithms.eaSimple(population, toolbox, params.crossover_probability,
-                                           params.mutation_probability, params.number_of_generations, statistics, verbose=True)
+                                           params.mutation_probability, params.number_of_generations, statistics, verbose=True, halloffame=hall_of_fame)
+
+    # print Hall of Fame info:
+    print("Hall of Fame Individuals = ", *hall_of_fame.items, sep="\n")
+    print("Best Ever Individual = ", hall_of_fame.items[0])
+    print(is_valid_individual(
+        hall_of_fame.items[0], products_data, params, show_stats_when_valid=True))
+    # def is_valid_individual(individual, products_data, hyperparams):
 
     return (population, info)
+
 
 def prepare_statistics_params():
     statistics = tools.Statistics(
