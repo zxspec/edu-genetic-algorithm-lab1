@@ -5,7 +5,7 @@ from hyperparams import Hyperparams
 from deap import base, creator, algorithms, tools
 
 
-def is_valid_individual(individual, products_data, hyperparams, show_stats_when_valid=False):
+def is_valid_individual(individual, products_data, hyperparams):
     cost = 0
     sum_space = 0
     for i in range(len(individual)):
@@ -16,14 +16,23 @@ def is_valid_individual(individual, products_data, hyperparams, show_stats_when_
                 print('### ❌ sum_space: ', sum_space)
                 print('### ❌ individual: ', individual)
                 return False
-    if show_stats_when_valid == True:
-        print('### 🔥 individual: ', individual)
-        print('### 🔥 sum_space: ', sum_space)
-        print('### 🔥 cost: ', cost)
     return True
 
+def show_individual_stats(individual, products_data):
+    cost = 0
+    sum_space = 0
+    for i in range(len(individual)):
+        if individual[i] == 1:
+            cost += products_data.prices[i]
+            sum_space += products_data.spaces[i]
 
-def get_custom_ga(params: Hyperparams, products_data: ProductsData, fitness, hall_of_fame):
+    print('### 🔥 individual: ', individual)
+    print('### 🔥 sum_space: ', sum_space)
+    print('### 🔥 cost: ', cost)
+
+
+
+def get_custom_ga(params: Hyperparams, products_data: ProductsData, fitness, hall_of_fame=None):
     genes_number = len(products_data.names)
     toolbox = base.Toolbox()
     creator.create('FitnessMax', base.Fitness, weights=(1.0,))
@@ -49,7 +58,8 @@ def get_custom_ga(params: Hyperparams, products_data: ProductsData, fitness, hal
     toolbox.register('mutate', tools.mutFlipBit,
                      indpb=params.mutation_probability)
     # create selection function, name `select` required by `eaSimple` algorithm
-    toolbox.register('select', tools.selRoulette)
+    # toolbox.register('select', tools.selRoulette)
+    toolbox.register('select', tools.selTournament, tournsize=3)
 
     population = toolbox.population(params.population_size)
 
@@ -58,12 +68,10 @@ def get_custom_ga(params: Hyperparams, products_data: ProductsData, fitness, hal
     population, info = algorithms.eaSimple(population, toolbox, params.crossover_probability,
                                            params.mutation_probability, params.number_of_generations, statistics, verbose=True, halloffame=hall_of_fame)
 
-    # print Hall of Fame info:
-    print("Hall of Fame Individuals = ", *hall_of_fame.items, sep="\n")
-    print("Best Ever Individual = ", hall_of_fame.items[0])
-    print(is_valid_individual(
-        hall_of_fame.items[0], products_data, params, show_stats_when_valid=True))
-    # def is_valid_individual(individual, products_data, hyperparams):
+    if hall_of_fame:
+        print("Hall of Fame Individuals = ", *hall_of_fame.items, sep="\n")
+        print("Best Ever Individual = ", hall_of_fame.items[0])
+        show_individual_stats(hall_of_fame.items[0], products_data)
 
     return (population, info)
 
